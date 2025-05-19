@@ -1,0 +1,61 @@
+## query
+extend type Query {
+    "Single park"
+    parked(id: ID! @eq): Area @find
+
+    "List of parked"
+    parkeds: [Parked!]! @all
+}
+## query
+
+## type
+type Parked {
+    "Unique primary key."
+    id: ID!
+
+    "The parking datetime"
+    in: DateTime!
+
+    "The datetime if the user quit earlier"
+    out: DateTime
+
+    "The total payment that the user need to pay"
+    total_payment: String!
+
+    "The payment status"
+    payment_status: String!
+
+    "The area that the user parked"
+    Area: Area @belongsTo
+
+    "The user who parked under certain area"
+    CustomUser: CustomUser @belongsTo
+}
+## type
+
+## mutation
+extend type Mutation {
+    createNewParkedRecord(
+        in: String!
+        area_id: ID!
+        custom_user_id: ID!
+        btn_type: String!
+    ): createNewParkedRecordResponse @field(resolver:"App\\GraphQL\\Mutations\\UserFeature\\RecordParked")
+
+    # deleteArea(
+    #     id: ID!
+    # ): DeleteAreaResponse @field(resolver:"App\\GraphQL\\Mutations\\AdminFeature\\DeleteArea")
+}
+
+type createNewParkedRecordResponse {
+    parked: Parked
+    status: Boolean
+    message: String
+}
+
+# type DeleteAreaResponse {
+#     status: Boolean
+#     message: String
+# }
+
+## mutation

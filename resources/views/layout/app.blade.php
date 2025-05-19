@@ -8,7 +8,8 @@
 <body class="bg-gray-200">
 
     <nav class="bg-white shadow p-4 flex justify-between items-center">
-        <a href="{{ route('home') }}" class="text-blue-700 text-lg font-semibold">Home</a>
+        {{-- <a href="{{ route('home') }}" class="text-blue-700 text-lg font-semibold">Home</a> --}}
+        <h1>Parking System Prototype</h1>
 
         <div class="flex items-center space-x-6">
             <div data-auth-only style="display: none;" class="flex items-center space-x-4">

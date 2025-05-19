@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\ParkingRate;
+use App\Models\Parked;
 
 class Area extends Model
 {
@@ -28,4 +30,8 @@ class Area extends Model
         return $this->belongsTo(ParkingRate::class, 'parking_rate_id');
     }
 
+    public function parked(): HasMany
+    {
+        return $this->hasMany(Parked::class);
+    }
 }

@@ -64,7 +64,7 @@
                     <th class="w-1/4 px-4 py-2 text-left">User(s)</th>
                     <th class="w-1/4 px-4 py-2 text-left">Available Parking Space (OKU)</th>
                     <th class="w-1/4 px-4 py-2 text-left">User(s)</th>
-                    <th class="w-1/4 px-4 py-2 text-left"></th>
+                    <th class="w-1/4 px-4 py-2 text-left">Parking Rate</th>
                     <th class="w-1/4 px-4 py-2 text-left"></th>
                 </tr>
 
@@ -187,8 +187,11 @@
                     title
                     parking_space_normal
                     parking_space_oku
+                    parking_space_normal_user
+                    parking_space_oku_user
                     ParkingRate {
                         title
+                        fees
                     }
                 }
             }
@@ -222,6 +225,7 @@
             areas.forEach((area, index) => {
                 const rowClass = index % 2 === 1 ? 'bg-gray-50' : '';
                 const normalUsers = Array.isArray(area.parking_space_normal_user) ? area.parking_space_normal_user.length : 0;
+                // const normalUsers = area.parking_space_normal_user ?? 0;
                 const okuUsers = Array.isArray(area.parking_space_oku_user) ? area.parking_space_oku_user.length : 0;
 
                 const row = `
@@ -231,7 +235,7 @@
                         <td class="border px-4 py-2">${normalUsers}</td>
                         <td class="border px-4 py-2">${area.parking_space_oku || '-'}</td>
                         <td class="border px-4 py-2">${okuUsers}</td>
-                        <td class="border px-4 py-2">${area.ParkingRate?.title || '-'}</td>
+                        <td class="border px-4 py-2">RM ${area.ParkingRate?.fees || '-'}</td>
                         <td class="border px-4 py-2">
                             <button 
                                 class="delete-btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none dlt-btn focus:shadow-outline"

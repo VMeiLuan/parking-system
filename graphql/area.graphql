@@ -20,13 +20,13 @@ type Area {
     parking_space_normal: String!
 
     "Users who parked under normal space"
-    parking_space_normal_user: Array
+    parking_space_normal_user: [Int!]
 
     "Amount for oke parking space"
     parking_space_oku: String!
 
     "Users who parked under oku space"
-    parking_space_oku_user: Array
+    parking_space_oku_user: [Int!]
 
     "The parking rate that belong to this area"
     ParkingRate: ParkingRate @belongsTo
