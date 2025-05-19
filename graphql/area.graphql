@@ -1,0 +1,61 @@
+## query
+extend type Query {
+    "Single area"
+    area(id: ID! @eq): Area @find
+
+    "List of area"
+    areas: [Area!]! @all
+}
+## query
+
+## type
+type Area {
+    "Unique primary key."
+    id: ID!
+
+    "Tile of the area"
+    title: String!
+
+    "Amount for normal parking space"
+    parking_space_normal: String!
+
+    "Users who parked under normal space"
+    parking_space_normal_user: Array
+
+    "Amount for oke parking space"
+    parking_space_oku: String!
+
+    "Users who parked under oku space"
+    parking_space_oku_user: Array
+
+    "The parking rate that belong to this area"
+    ParkingRate: ParkingRate @belongsTo
+}
+## type
+
+## mutation
+extend type Mutation {
+    createArea(
+        title: String!
+        parking_space_normal: String!
+        parking_space_oku: String!
+        parking_rate_id: Int!
+    ): CreateAreaResponse @field(resolver:"App\\GraphQL\\Mutations\\AdminFeature\\CreateArea")
+
+    deleteArea(
+        id: ID!
+    ): DeleteAreaResponse @field(resolver:"App\\GraphQL\\Mutations\\AdminFeature\\DeleteArea")
+}
+
+type CreateAreaResponse {
+    area: Area
+    status: Boolean
+    message: String
+}
+
+type DeleteAreaResponse {
+    status: Boolean
+    message: String
+}
+
+## mutation

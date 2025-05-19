@@ -1,0 +1,93 @@
+## query
+type Query {
+    "Find a single user by ID"
+    user(id: ID! @eq): CustomUser @find
+
+    "List of CustomUser"
+    users: [CustomUser!]! @all(relations: ["role"])
+
+    "Find a single role by ID"
+    role(id: ID! @eq): Role @find
+
+    "List of roles"
+    roles: [Role!]! @all
+}
+## query
+
+## type
+"user"
+type CustomUser {
+    "Unique primary key."
+    id: ID!
+    
+    "user role"
+    role: Role @belongsTo
+
+    "non-unique name"
+    name: String!
+
+    "unique email of the user"
+    email: String!
+
+    "When the account was created."
+    created_at: DateTime!
+
+    "When the account was last updated."
+    updated_at: DateTime!
+
+    users: [User!]! @hasMany
+}
+
+"Role of the user"
+type Role {
+    "Unique primary key."
+    id: ID!
+
+    "Non-unique name."
+    role: String!
+
+    "When the account was created."
+    created_at: DateTime!
+
+    "When the account was last updated."
+    updated_at: DateTime!
+
+    users: [User!]! @hasMany
+}
+## type
+
+## mutation
+type Mutation {
+    registerUser(
+        name: String!
+        email: String!
+        password: String!
+        confirm_password: String!
+        role_id: Int!
+    ): RegisterUserResponse @field(resolver: "App\\GraphQL\\Mutations\\User\\RegisterUser")
+
+  loginUser(
+        email: String!
+        password: String!
+    ): LoginUserResponse @field(resolver:"App\\GraphQL\\Mutations\\User\\LoginUser")
+
+    ## to be able to use in both env
+    logoutUser : LogoutUserResponse @guard(with: ["sanctum", "web"]) @field(resolver:"App\\GraphQL\\Mutations\\User\\LogoutUser") 
+}
+
+type RegisterUserResponse {
+    user: CustomUser
+    message: String
+}
+
+type LoginUserResponse {
+    user: CustomUser
+    message: String
+    token: String
+}
+
+type LogoutUserResponse {
+    message: String
+    status: String
+}
+## mutation

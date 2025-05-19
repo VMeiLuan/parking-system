@@ -1,0 +1,59 @@
+## query
+extend type Query {
+    "Single parking rate"
+    parkingrate(id: ID! @eq): ParkingRate @find
+
+    "List of parking rate"
+    parkingrates: [ParkingRate!]! @all
+}
+## query
+
+## type
+type ParkingRate {
+    "Unique primary key."
+    id: ID!
+
+    "Tile of the rate"
+    title: String!
+
+    "Fees belong to the title per hour"
+    fees: String!
+
+    "Duration for the parking rate"
+    hours: String!
+
+    "The description of the parking rate"
+    description: String!
+
+    "The remark or important note of the parking rate"
+    remark: String
+}
+## type
+
+## mutation
+extend type Mutation {
+    createParkingRate(
+        title: String!
+        fees: String!
+        hours: String!
+        description: String!
+        remark: String
+    ): CreateParkingRateResponse @field(resolver:"App\\GraphQL\\Mutations\\AdminFeature\\CreateParkingRate")
+
+    deleteParkingRate(
+        id: ID!
+    ): DeleteParkingRateResponse @field(resolver:"App\\GraphQL\\Mutations\\AdminFeature\\DeleteParkingRate")
+}
+
+type CreateParkingRateResponse {
+    parkingrate: ParkingRate
+    status: Boolean
+    message: String
+}
+
+type DeleteParkingRateResponse {
+    status: Boolean
+    message: String
+}
+
+## mutation
