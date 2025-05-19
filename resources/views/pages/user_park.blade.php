@@ -77,6 +77,10 @@
                     title
                     parking_space_normal
                     parking_space_oku
+                    ParkingRate {
+                        fees
+                        hours
+                    }
                 }
             }
         `;
@@ -94,7 +98,12 @@
 
             const data = await res.json();
             const rates = data.data.areas || [];
+            // rates.forEach(area => {
+            //     const fees = area.ParkingRate?.fees || '-';
+            //     const hours = area.ParkingRate?.hours || '-';
 
+            //     console.log(`Area: ${area.title}, Fees: RM ${fees}, Duration: ${hours} hour(s)`);
+            // });
             parkingRateDropdown.innerHTML = '';
 
             if (rates.length === 0) {
@@ -122,6 +131,8 @@
                 option.text = rate.title;
                 option.dataset.normal = rate.parking_space_normal;
                 option.dataset.oku = rate.parking_space_oku;
+                option.dataset.fees = rate.ParkingRate.fees;
+                option.dataset.hours = rate.ParkingRate.hours;
                 parkingRateDropdown.appendChild(option);
             });
 
@@ -130,11 +141,15 @@
                 const selected = parkingRateDropdown.options[parkingRateDropdown.selectedIndex];
                 const normal = selected.dataset.normal || '-';
                 const oku = selected.dataset.oku || '-';
+                const fees = selected.dataset.fees || '-';
+                const hours = selected.dataset.hours || '-';
 
                 if (selected.value) {   
                     availabilityDiv.innerHTML = `
                         <p><strong>Available Normal Space:</strong> ${normal}</p>
                         <p><strong>Available OKU Space:</strong> ${oku}</p>
+                        <br>
+                        <p><strong>Parking rate:</strong> RM ${fees} / ${hours} hour(s)</p>
                     `;
 
                     inNormalBtn.textContent = `IN Normal @ ${now.toLocaleString()}`;
