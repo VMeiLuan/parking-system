@@ -54,6 +54,23 @@
         </table>
     </div>
 
+    <!-- payment Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96 relative">
+            <h2 class="text-lg font-semibold mb-4">Confirm Payment</h2>
+            <p><strong>Area:</strong> <span id="modalAreaId">-</span></p>
+            <p><strong>Total Payment:</strong> RM <span id="modalPaymentAmount">-</span></p>
+
+            <button id="payNowBtn"
+                class="mt-6 w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Pay Now
+            </button>
+
+            <button id="closeModal"
+                class="absolute top-2 right-2 text-gray-600 hover:text-gray-800 font-bold text-xl">&times;</button>
+        </div>
+    </div>
+
 <script>
     document.addEventListener('DOMContentLoaded', async function () {
         const token = localStorage.getItem('authToken');
@@ -191,6 +208,7 @@
                     console.log(result)
                     console.log('Mutation response:', result.data.createNewParkedRecord);
                     alert(result.data.createNewParkedRecord.message || 'Success');
+                    location.reload();
                 } catch (error) {
                     console.error('Mutation failed:', error);
                     alert('Failed to record IN time.');
@@ -235,6 +253,7 @@
                     in
                     payment_status
                     Area {
+                        id
                         title
                         ParkingRate {
                             fees
@@ -276,7 +295,7 @@
                     <tr class="${rowClass}">
                         <td class="border px-4 py-2">${parked.in || '-'}</td>
                         <td class="border px-4 py-2">${parked.Area?.title || '-'}</td>
-                        <td class="border px-4 py-2">RM ${parked.Area?.ParkingRate?.fees || '-'}</td>
+                        <td class="border px-4 py-2" data-fees="${parked.Area?.ParkingRate?.fees || 0}">RM ${parked.Area?.ParkingRate?.fees || '-'}</td> 
                         <td class="border px-4 py-2">
                         <span class="${parked.payment_status == 0 ? 'text-red-500 font-semibold' : 'text-green-600 font-semibold'}">
                             ${parked.payment_status == 0 ? 'Pending' : 'Paid'}
@@ -284,11 +303,14 @@
                         </td>
                         <td class="border px-4 py-2">
                             <button 
-                                class="delete-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none dlt-btn focus:shadow-outline"
-                                data-id="${area.id}"
+                                class="pay-now-btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                                data-id="${parked.id}"
+                                data-area-id="${parked.Area?.id || ''}" 
+                                data-user-id="${parked.custom_user_id || ''}" 
+                                data-fees="${parked.Area?.ParkingRate?.fees || 0}" 
                                 style="cursor:pointer"
                             >
-                                Payment
+                                Pay Now
                             </button>
                         </td>
                     </tr>
@@ -296,14 +318,64 @@
                 tbody.insertAdjacentHTML('beforeend', row);
             });
 
-            const form = document.getElementById('createParkingRate');
-            if (parkeds.length > 0) {
-                Array.from(form.elements).forEach(el => el.disabled = true);
+            // payment 
+            const modal = document.getElementById('paymentModal');
+            const modalAreaId = document.getElementById('modalAreaId');
+            const modalPaymentAmount = document.getElementById('modalPaymentAmount');
+            const payNowBtn = document.getElementById('payNowBtn');
+            const closeModal = document.getElementById('closeModal');
 
-                const message = document.createElement('div');
-                message.className = 'text-red-500 mt-4 font-semibold';
-                message.innerText = 'Please proceed with pending payment to do a new record.';
-                form.appendChild(message);
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const areaId = this.dataset.id;
+                    const payment = this.dataset.fees;
+
+                    modalAreaId.textContent = areaId;
+                    modalPaymentAmount.textContent = payment;
+                    modal.classList.remove('hidden');
+
+                    // You can customize this logic for actual payment mutation
+                    payNowBtn.onclick = function () {
+                        alert(`Payment of RM ${payment} for ${areaId} processed.`);
+                        modal.classList.add('hidden');
+                    };
+                });
+            });
+
+            closeModal.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+
+            const form = document.getElementById('createParkingRate');
+                // if (parkeds.length > 0) {
+                //     Array.from(form.elements).forEach(el => el.disabled = true);
+
+                //     const message = document.createElement('div');
+                //     message.className = 'text-red-500 mt-4 font-semibold';
+                //     message.innerText = 'Please proceed with pending payment to do a new record.';
+                //     form.appendChild(message);
+                // }
+
+            const hasPendingPayment = parkeds.some(p => p.payment_status == 0);
+            const messageId = 'pending-payment-message';
+            if (hasPendingPayment) {
+                Array.from(form.elements).forEach(el => el.disabled = true);
+                // disable
+                if (!document.getElementById(messageId)) {
+                    const message = document.createElement('div');
+                    message.id = messageId;
+                    message.className = 'text-red-500 mt-4 font-semibold';
+                    message.innerText = 'Please proceed with pending payment to do a new record.';
+                    form.appendChild(message);
+                }
+            } else {
+                Array.from(form.elements).forEach(el => el.disabled = false);
+
+                const existingMessage = document.getElementById(messageId);
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
             }
         } catch (error) {
             console.error('Error loading user parking data:', error);
@@ -314,6 +386,67 @@
             `;
         }
         // user parking history
-    });
+
+        // payment
+        document.querySelectorAll('.pay-now-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const user = JSON.parse(userData);
+                const parkedId = btn.getAttribute('data-id');
+                const customUserId = user.id;
+                const areaId = btn.getAttribute('data-area-id');
+                const totalPayment = btn.getAttribute('data-fees');
+
+                const endpoint = '/graphql';
+                const paymentRecordQuery = `
+                    mutation paymentRecord($id: ID!, $custom_user_id: ID!, $area_id: ID!, $total_payment: String!) {
+                        paymentRecord(id: $id, custom_user_id: $custom_user_id, area_id: $area_id, total_payment: $total_payment) {
+                            parked {
+                                payment_status
+                            }
+                            status
+                            message
+                        }
+                    }
+                `;
+
+                const variables = {
+                    id: parkedId,
+                    custom_user_id: customUserId,
+                    area_id: areaId,
+                    total_payment: totalPayment
+                };
+
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                        },
+                        body: JSON.stringify({ query: paymentRecordQuery, variables })
+                    });
+
+                    const result = await response.json();
+                    console.log(result);
+                    const paymentResult = result?.data?.paymentRecord;
+
+                    if (paymentResult?.status === true) {
+                        alert('Payment successful!');
+                        location.reload();
+                        // Optional: refresh or redirect
+                    } else {
+                        alert('Payment failed: ' + (paymentResult?.message || 'Unknown error'));
+                    }
+
+                } catch (error) {
+                    console.error('Payment request error:', error);
+                    alert('Something went wrong.');
+                }
+            });
+        });        
+        // payment
+
+});
 </script>
 @endsection

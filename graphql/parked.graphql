@@ -42,9 +42,12 @@ extend type Mutation {
         btn_type: String!
     ): createNewParkedRecordResponse @field(resolver:"App\\GraphQL\\Mutations\\UserFeature\\RecordParked")
 
-    # deleteArea(
-    #     id: ID!
-    # ): DeleteAreaResponse @field(resolver:"App\\GraphQL\\Mutations\\AdminFeature\\DeleteArea")
+    paymentRecord(
+        id: ID!
+        custom_user_id: ID!
+        area_id: ID!
+        total_payment: String!
+    ): paymentRecordResponse @field(resolver:"App\\GraphQL\\Mutations\\UserFeature\\PaymentRecord")
 }
 
 type createNewParkedRecordResponse {
@@ -53,9 +56,10 @@ type createNewParkedRecordResponse {
     message: String
 }
 
-# type DeleteAreaResponse {
-#     status: Boolean
-#     message: String
-# }
+type paymentRecordResponse {
+    parked: Parked
+    status: Boolean
+    message: String
+}
 
 ## mutation
