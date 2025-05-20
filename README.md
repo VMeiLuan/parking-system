@@ -1,5 +1,4 @@
-Task from Webby
-
+**To setup the project**
 1. Clone this project
 2. Setup .env
 3. Run **composer install** if needed
@@ -16,16 +15,31 @@ Task from Webby
 8. Visit http://localhost:8000/graphiql for GrapgQL interface
 
 ---
-
-Completed task
-
-1. Login / Logout
-2. Registration for user
-3. Admin
-    1. To create a area with parking rate
-    2. To delete exisitng area
-    3. To create a new parking rate
-    4. To delete existing parking rate
-    5. To check all the users
-4. User
-    1. To check available spaces from an area
+**Completed task**
+1. Login
+2. Logout
+3. User Registration
+4. Admin
+    1. To create an area with a parking rate
+    2. To delete the existing area
+    3. Ability to track the number of users parked in a specific area, categorized by parking type (only 1 user for now)
+    4. Ability to view the current number of available parking spaces after users have parked (only 1 user for now)
+    5. To create a new parking rate
+    6. To delete the existing parking rate
+    7. Able to check on a list of users
+5. User
+    1. To choose a parking space based on different categories
+    2. To check available spaces in an area
+    3. To make a payment 
+  
+---
+**Incomplete task**
+1. Admin registration / user creation under Admin
+2. Admin
+   1. To edit the existing area
+   2. To edit the existing parking rate
+   3. Unable to create special rate for special date / day / other settings
+   4. To edit the users' profiles
+3. User
+   1. Unable to search number plate
+   2. Users' parking records are not displayed separately for each user
